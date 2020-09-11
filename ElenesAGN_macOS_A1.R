@@ -12,7 +12,7 @@ library(openxlsx)
 library(reshape2)
 library(dplyr)
 # Data files necessary to run this script:
-
+# 3_1_Generator_Y2018.xlsx
 #### 2 ####
 # Create a dataset of 5000 random numbers generated in R 
 # using any model distribution you like. Write an R script 
