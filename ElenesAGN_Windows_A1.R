@@ -1,7 +1,7 @@
 # Alejandro G.N. Elenes
 # Problem 1 ----
 
-# Code written in macOS Catalina version 10.15.6
+# Code written in Windows 10 Home
 
 # R packages needed to run this script:
 library(ggplot2)
@@ -11,7 +11,6 @@ library(openxlsx)
 library(reshape2)
 library(dplyr)
 library(tidyverse)
-library(ggpubr)
 library(rstatix)
 library(Rmisc)
 library(grid)
@@ -19,7 +18,9 @@ library(MASS)
 library(mixtools)
 
 # Data files necessary to run this script:
-# 3_1_Generator_Y2018.xlsx # included with script
+
+# 3_1_Generator_Y2018.xlsx # included with script, can also be accessed through https://www.eia.gov/electricity/data/eia860/archive/xls/eia8602018.zip
+
 # NEM_CurrentlyInterconnectedDataset_2020-04-30.csv # can be accessed through here: https://www.californiadgstats.ca.gov/download/interconnection_rule21_projects/NEM_CurrentlyInterconnectedDataset_2020-04-30.zip
 
 # Problem 2 ----
@@ -282,17 +283,32 @@ dataset2 <- data.frame(cost,systemsizeac,taxcredit,EVcount)
 pca <- prcomp(dataset2, scale=TRUE)
 stats_pca <- summary(pca)
 
-pcadata <- data.frame(PC= paste0("PC",1:4), variance_explained=round((pca$sdev)^2/sum((pca$sdev)^2)*100))
+pcadata <-
+  data.frame(
+    PC = paste0("PC", 1:4),
+    variance_explained = round((pca$sdev) ^ 2 / sum((pca$sdev) ^ 2) * 100))
+
+pc <- 
+  data.frame(
+    pc1 = pca$x[, 1],
+    pc2 = pca$x[, 2],
+    pc3 = pca$x[, 3],
+    pc4 = pca$x[, 4]
+  )
 
 pca_screeplot <-   ggplot(pcadata, aes(x=PC,y=variance_explained,group=1))+
   geom_bar(stat="identity", fill='black')+
   labs(title ="Scree plot of PCA", x = "\n Principal Component", y = "Percent of variation explained\n")+ theme_bw()
 
 pca_rotations <- (pca[["rotation"]])
+pca_rotations
 
-# plot(pca$x[,1], pca$x[,2])
-# plot(pca$x[,2], pca$x[,3])
-# plot(pca$x[,3], pca$x[,4])
+pca_1vs2 <- ggplot(pc, aes(x = pc1, y = pc2)) + geom_point() +
+  labs(title = "Principal components", x = "\n PC1", y = "PC2\n") + theme_bw()
+pca_2vs3 <- ggplot(pc, aes(x = pc2, y = pc3)) + geom_point() +
+  labs(title = "Principal components", x = "\n PC2", y = "PC3\n") + theme_bw()
+pca_3vs4 <- ggplot(pc, aes(x = pc3, y = pc4)) + geom_point() +
+  labs(title = "Principal components", x = "\n PC3", y = "PC4\n") + theme_bw()
 
 # Problem 12 ----
 
@@ -320,12 +336,6 @@ dataset2$cluster <- as.character(kmeans$cluster)
 
 kmeans_scatter <- ggplot(dataset2, aes(x=systemsizeac,y=cost, shape=cluster, color=cluster)) + geom_point() + labs (title="K-means clustering",x= "\nSystem size [kW]",y="System cost [$]")+ theme_bw()
 kmeans_scatter
-
-pdf("kmeans_scatters.pdf")
-pushViewport(viewport(layout = grid.layout(2, 1)))
-print(color_scatter, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(kmeans_scatter, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
-dev.off()
 
 # Problem 14 ----
 
@@ -364,14 +374,6 @@ hist_lognormal <- ggplot(dataset, aes(x=ind_variable)) + geom_histogram(aes(y=..
 hist_exponential <- ggplot(dataset, aes(x=ind_variable)) + geom_histogram(aes(y=..density..)) + geom_density() + stat_function(fun=dexp, color="red", args=list(rate = exponential$estimate[1]))+ labs(title='Exponential fit',x='Unit cost [$/kW]', y='Density')+ theme_bw()
 
 hist_GMM <- ggplot(dataset, aes(x=ind_variable)) + geom_histogram(aes(y=2*(..density..))) + geom_density(aes(y=2*(..density..))) + stat_function(fun=dnorm, color="red", args=list(mean = GMM$mu[1], sd = GMM$sigma[1])) + stat_function(fun=dnorm, color="red", args=list(mean = GMM$mu[2], sd = GMM$sigma[2]))+ labs(title='GMM fit',x='Unit cost [$/kW]', y='2*Density')+ theme_bw()
-
-pdf("gmmfits.pdf")
-pushViewport(viewport(layout = grid.layout(2, 2)))
-print(hist_normal, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(hist_lognormal, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
-print(hist_exponential, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
-print(hist_GMM, vp = viewport(layout.pos.row = 2, layout.pos.col = 2))
-dev.off()
 
 # RUN OUTPUTS SECTION AGAIN (AFTER SOURCING) ----
     # Text outputs ----
@@ -503,7 +505,7 @@ multiplot(Pearson_scatter)
 # Problem 6 ----
 multiplot(OLSplot)
 # Problem 11 ----
-multiplot(pca_screeplot)
+multiplot(pca_screeplot,pca_1vs2, pca_2vs3,pca_3vs4,cols=2)
 # Problem 13 ----
 multiplot(color_scatter,kmeans_scatter)
 # Problem 15 ----
