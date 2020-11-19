@@ -5,14 +5,12 @@ library(readr)
 library(class)
 library(gmodels)
 library(ggplot2)
-library(caret)
 library(GGally)
 library(corrplot)
 library(Rmisc)
 library(e1071)
 library(caret)
 library(MASS)
-library(mda)
 library(dplyr)
 library(kernlab)
 
@@ -347,7 +345,7 @@ dev.off()
 # multiplot(corrs)
 # dev.off()
 
-# export confusion matrices ----
+# confusion matrices ----
 
 svme_confusionmatrix1 <- confusionMatrix(as.factor(validation1$diagnosis),as.factor(svme_pred1))
 svme_confusionmatrix2 <- confusionMatrix(as.factor(validation2$diagnosis),as.factor(svme_pred2))
@@ -385,43 +383,70 @@ svmkr_confusionmatrix3 <- confusionMatrix(as.factor(validation3$diagnosis),as.fa
 svmkr_confusionmatrix4 <- confusionMatrix(as.factor(validation4$diagnosis),as.factor(svmkr_pred4))
 svmkr_confusionmatrix5 <- confusionMatrix(as.factor(validation5$diagnosis),as.factor(svmkr_pred5))
 
+# export text outputs ----
+
 sink(file = 'ElenesAGN_A2_Problem2_TextOutputs.txt')
 
+writeLines(" \n\n Confusion matrices for 5-fold cross validation of linear SVM \n")
 print(svme_confusionmatrix1)
 print(svme_confusionmatrix2)
 print(svme_confusionmatrix3)
 print(svme_confusionmatrix4)
 print(svme_confusionmatrix5)
 
+writeLines(" \n\n Confusion matrices for 5-fold cross validation of polynomial SVM \n")
 print(svmp_confusionmatrix1)
 print(svmp_confusionmatrix2)
 print(svmp_confusionmatrix3)
 print(svmp_confusionmatrix4)
 print(svmp_confusionmatrix5)
 
+writeLines(" \n\n Confusion matrices for 5-fold cross validation of radial SVM \n")
 print(svmr_confusionmatrix1)
 print(svmr_confusionmatrix2)
 print(svmr_confusionmatrix3)
 print(svmr_confusionmatrix4)
 print(svmr_confusionmatrix5)
 
+writeLines(" \n\n Confusion matrices for 5-fold cross validation of tuned linear SVM \n")
 print(svmke_confusionmatrix1)
 print(svmke_confusionmatrix2)
 print(svmke_confusionmatrix3)
 print(svmke_confusionmatrix4)
 print(svmke_confusionmatrix5)
 
+writeLines(" \n\n Confusion matrices for 5-fold cross validation of tuned qudratic SVM \n")
 print(svmkp_confusionmatrix1)
 print(svmkp_confusionmatrix2)
 print(svmkp_confusionmatrix3)
 print(svmkp_confusionmatrix4)
 print(svmkp_confusionmatrix5)
 
+writeLines(" \n\n Confusion matrices for 5-fold cross validation of tuned radial SVM \n")
 print(svmkr_confusionmatrix1)
 print(svmkr_confusionmatrix2)
 print(svmkr_confusionmatrix3)
 print(svmkr_confusionmatrix4)
 print(svmkr_confusionmatrix5)
+
+writeLines(" \n\n Accuracies for linear, quadratic, radial, and tuned linear, quadratic & radial SVMs \n")
+print(svme_accuracies)
+print(svmp_accuracies)
+print(svmr_accuracies)
+print(svmke_accuracies)
+print(svmkp_accuracies)
+print(svmkr_accuracies)
+
+writeLines(" \n\n Mean accuracies for linear, quadratic, radial, and tuned linear, quadratic & radial SVMs \n")
+print(mean(svme_accuracies))
+print(mean(svmp_accuracies))
+print(mean(svmr_accuracies))
+print(mean(svmke_accuracies))
+print(mean(svmkp_accuracies))
+print(mean(svmkr_accuracies))
+
+writeLines(" \n\n tuned and not tuned linear SVM model tie with tuned quadratic SVM for the best prediction power \n")
+writeLines(" \n\n Classification turned out better than with simpler methods, it went from 95.22 to 97.34 \n")
 
 sink()
 

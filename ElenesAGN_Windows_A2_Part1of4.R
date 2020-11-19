@@ -5,7 +5,6 @@ library(readr)
 library(class)
 library(gmodels)
 library(ggplot2)
-library(caret)
 library(GGally)
 library(corrplot)
 library(Rmisc)
@@ -229,7 +228,7 @@ qda_scatter_5_pred <- ggplot(validation5, aes(area_worst, concave.points_worst, 
 
 # export plots ----
 
-pdf(file = 'ElenesAGN_A2_GraphicOutputs.pdf')
+pdf(file = 'ElenesAGN_A2_Problem1_GraphicOutputs.pdf')
 
 multiplot(scatter_validation1,knn_scatter_1_pred)
 multiplot(scatter_validation2,knn_scatter_2_pred)
@@ -261,7 +260,7 @@ png(filename="Pairs_correlograms.png",width=3840,height=2160)
 multiplot(corrs)
 dev.off()
 
-# export confusion matrices ----
+# confusion matrices ----
 knn_confusionmatrix1 <- confusionMatrix(as.factor(validation1$diagnosis),as.factor(knn_pred1))
 knn_confusionmatrix2 <- confusionMatrix(as.factor(validation2$diagnosis),as.factor(knn_pred2))
 knn_confusionmatrix3 <- confusionMatrix(as.factor(validation3$diagnosis),as.factor(knn_pred3))
@@ -286,26 +285,68 @@ qdaconfusionmatrix3 <- confusionMatrix(as.factor(validation3$diagnosis),as.facto
 qdaconfusionmatrix4 <- confusionMatrix(as.factor(validation4$diagnosis),as.factor(qdapred4$class))
 qdaconfusionmatrix5 <- confusionMatrix(as.factor(validation5$diagnosis),as.factor(qdapred5$class))
 
-sink(file = 'ElenesAGN_A2_TextOutputs.txt')
+# export text outputs ----
+sink(file = 'ElenesAGN_A2_Problem1_TextOutputs.txt')
+
+writeLines(" \nAbout the data")
+
+writeLines(" \n\n The explanatory variables are the mean, standard deviation and the worst measurement of the following features: \n")
+writeLines(" 1. Radius")
+writeLines(" 2. Texture")
+writeLines(" 3. Perimeter")
+writeLines(" 4. Area")
+writeLines(" 5. Smoothness")
+writeLines(" 6. Compactness")
+writeLines(" 7. Concavity")
+writeLines(" 8. Concave points")
+writeLines(" 9. Symmetry")
+writeLines(" 10. Fractal dimension")
+writeLines(" \n\n I can see some trends by visual inspection of the correlogram made with ggpairs. \n")
+writeLines(" \n\n In the diagonal, I show the distribution of the data for malignant (blue) and benign (red) tumors; the more separated these red and blue distributions are, the better the data will help in predicting the malignant or benign property of the tumor. If these distributions overlap too much, data will not be as useful for classification. \n")
+writeLines(" \n\n The overlap seems to be larger when comparing the standard deviation of the measurements, which means the variability of the data is similar in both cases. If we compare the overlap in mean values vs that of worst measurements, they seem to mirror each other, however, the overlap slightly decreases in worst measurements, indicating that these could be more useful than mean and standard deviation values for classification. \n")
+writeLines(" \n\n Below the diagonal we see the specific correlations. Some strong correlations show that features are connected, for example, radius, perimeter and area are all measures of size, and thus they are strongly correlated. Texture and symmetry do not correlate with any other feature. Another group of features with a smaller and more dispersive correlation is that of smoothness, compactness, concavity and concave points. Fractal dimension does not correlate with any other feature except for smoothness, compactness and concavity, but it's a small correlation and can only be observed in the set of worst measurements. \n")
+writeLines(" \n\n Given these observations, for the scatterplots showing output results I decided to use the worst measurements for one feature from each of the dominant groups: worst measurement of area, from the group of features related to size, and worst measurement of concave points, from the group of features related to shape. \n")
+
+writeLines(" \n\n Confusion matrices for 5-fold cross validation of k nearest neighbors \n")
 print(knn_confusionmatrix1)
 print(knn_confusionmatrix2)
 print(knn_confusionmatrix3)
 print(knn_confusionmatrix4)
 print(knn_confusionmatrix5)
+
+writeLines(" \n\n Confusion matrices for 5-fold cross validation of Naive Bayes classifier \n")
 print(NBconfusionmatrix1)
 print(NBconfusionmatrix2)
 print(NBconfusionmatrix3)
 print(NBconfusionmatrix4)
 print(NBconfusionmatrix5)
+
+writeLines(" \n\n Confusion matrices for 5-fold cross validation of linear discriminant analysis \n")
 print(ldaconfusionmatrix1)
 print(ldaconfusionmatrix2)
 print(ldaconfusionmatrix3)
 print(ldaconfusionmatrix4)
 print(ldaconfusionmatrix5)
+
+writeLines(" \n\n Confusion matrices for 5-fold cross validation of quadratic discriminant analysis \n")
 print(qdaconfusionmatrix1)
 print(qdaconfusionmatrix2)
 print(qdaconfusionmatrix3)
 print(qdaconfusionmatrix4)
 print(qdaconfusionmatrix5)
-sink()
 
+writeLines(" \n\n Accuracies for knn, NB, lda and qda \n")
+print(knn_accuracies)
+print(NB_accuracies)
+print(lda_accuracies)
+print(qda_accuracies)
+
+writeLines(" \n\n Mean accuracies for knn, NB, lda and qda \n")
+print(mean(knn_accuracies))
+print(mean(NB_accuracies))
+print(mean(lda_accuracies))
+print(mean(qda_accuracies))
+
+writeLines(" \n\n knn model has the best prediction power \n")
+
+sink()
